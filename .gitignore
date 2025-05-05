@@ -1,0 +1,23 @@
+node_modules/
+.env
+.env.*
+public/
+dist/
+build/
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage/
+.vscode/
+.idea/
+Thumbs.db
+.DS_Store
+# Docker ignores
+npm-debug.log
+dist
+coverage
+*.spec.js
+Dockerfile
+.dockerignore
