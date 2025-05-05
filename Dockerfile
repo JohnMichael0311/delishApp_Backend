@@ -42,7 +42,7 @@ ENV STRIPE_SECRET_KEY=sk_test_51RL2BtQE9tlu0TT9HiiRtmtwsUse607wHQGvys6stqDPThnXd
 
 
 # Expose the port (default 5000, change if your backend uses another)
-EXPOSE 5000
+EXPOSE ${PORT}
 
 # Start the server (edit if your entrypoint is different)
 CMD ["npm", "start"]
