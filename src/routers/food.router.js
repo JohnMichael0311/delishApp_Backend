@@ -8,6 +8,9 @@ import { cache, CACHE_TTL } from '../utils/simpleCache.js';
 
 const router = Router();
 
+router.get('/', (req, res) => {
+  res.json({ message: 'All foods route working' });
+});
 // GET all foods
 
 /**
