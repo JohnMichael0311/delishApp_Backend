@@ -398,6 +398,9 @@ import { cache, CACHE_TTL } from '../utils/simpleCache.js';
 const router = Router();
 
 // GET all foods
+router.get('/', (req, res) => {
+  res.json({ message: 'All foods route working' });
+});
 
 /**
  * @swagger
