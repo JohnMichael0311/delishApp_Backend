@@ -9,6 +9,11 @@ COPY package*.json ./
 
 # Install dependencies
 RUN npm install --production
+# Copy rest of the backend code
+COPY . .
+
+ENV NODE_ENV=production
+ENV NODE_OPTIONS="--experimental-vm-modules"
 
 # Redis Configuration
 ENV REDIS_URL=redis-16958.c301.ap-south-1-1.ec2.redns.redis-cloud.com:16958
@@ -28,15 +33,13 @@ ENV REDIS_PORT=16958
 ENV MONGO_URI=mongodb+srv://rishika:1234@rishika.d2ouvag.mongodb.net/newDB
 
 # Environment
-ENV NODE_ENV=docker
-ENV NODE_OPTIONS="--experimental-vm-modules"
+# ENV NODE_ENV=docker
 ENV PORT=5000
 
 ENV JWT_SECRET="random#secret"
 ENV STRIPE_SECRET_KEY=sk_test_51RL2BtQE9tlu0TT9HiiRtmtwsUse607wHQGvys6stqDPThnXdAJGRN77s0YhafI8quw3SEtkuVAd7kcCQwuMYta000JM7baOTd
 
-# Copy rest of the backend code
-COPY . .
+
 
 # Expose the port (default 5000, change if your backend uses another)
 EXPOSE 5000
