@@ -513,10 +513,23 @@ app.use(
 app.use(morgan('dev'));
 app.use(morgan('combined', { stream: accessLogStream }));
 app.use(express.json());
-app.use(cors({
+
+const allowedOrigins = [
+  'https://delish-frontend-ctniwh08u-john-michaels-projects-49379021.vercel.app/'
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed from this origin: ' + origin));
+    }
+  },
   credentials: true,
-  origin: ['http://localhost:3000'],
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
 app.use(express.urlencoded({ extended: true }));
 
 // Monitoring routes
