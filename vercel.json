@@ -1,16 +1,26 @@
 {
-    "version": 2,
-    "builds": [
-     {
-      "src": "server.js",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/**"] }
-     }
-    ],
-    "routes": [
-     {
+  "version": 2,
+  "builds": [
+    {
+      "src": "src/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
       "src": "/(.*)",
-      "dest": "server.js"
-     }
-    ]
-   }
+      "dest": "src/index.js",
+      "methods": ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+        "Access-Control-Allow-Credentials": "true"
+      }
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "mongodb+srv://rishika:1234@rishika.d2ouvag.mongodb.net/newDB",
+    "JWT_SECRET": "group23",
+    "PORT": "5000"
+  }
+} 
