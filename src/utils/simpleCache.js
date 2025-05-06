@@ -263,7 +263,6 @@
 //     }
 //   },
 // };
-// src/services/cache.ts or wherever you manage Redis
 
 import { createClient } from 'redis';
 
@@ -315,7 +314,7 @@ export const cache = {
   metrics,
   client,
 
-  async get(key: string) {
+  async get(key) {
     try {
       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis GET: ${key}`);
       metrics.totalRequests++;
@@ -335,7 +334,7 @@ export const cache = {
     }
   },
 
-  async set(key: string, value: any, ttl: number) {
+  async set(key, value, ttl) {
     try {
       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis SET: ${key}`);
       if (typeof ttl !== 'number' || ttl <= 0) throw new Error(`Invalid TTL for Redis SET: ${ttl}`);
@@ -348,7 +347,7 @@ export const cache = {
     }
   },
 
-  async delete(key: string) {
+  async delete(key) {
     try {
       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis DELETE: ${key}`);
       return await client.del(key);
