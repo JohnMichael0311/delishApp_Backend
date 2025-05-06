@@ -171,41 +171,135 @@
 // };
 
 
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
+
+// // export const CACHE_TTL = {
+// //   FOODS: 60 * 60,         // 1 hour for food listings
+// //   TAGS: 30 * 60,          // 30 mins for tags
+// //   SEARCH: 15 * 60,        // 15 mins for search results
+// //   FOOD_DETAIL: 60 * 60,   // 1 hour for individual food item
+// // };
+// // export const CACHE_TTL = {
+// //     FOODS: 60 * 60,         // 1 hour
+// //     TAGS: 30 * 60,          // 30 minutes
+// //     SEARCH: 15 * 60,        // 15 minutes
+// //     FOOD_DETAIL: 60 * 60,   // 1 hour
+// //     USER: 60 * 60,          // ✅ Add this: 1 hour for user data
+// //   };
 
 // export const CACHE_TTL = {
-//   FOODS: 60 * 60,         // 1 hour for food listings
-//   TAGS: 30 * 60,          // 30 mins for tags
-//   SEARCH: 15 * 60,        // 15 mins for search results
-//   FOOD_DETAIL: 60 * 60,   // 1 hour for individual food item
+//   FOODS: 60 * 60,
+//   TAGS: 30 * 60,
+//   SEARCH: 15 * 60,
+//   FOOD_DETAIL: 60 * 60,
+//   USER: 60 * 60,
+//   ORDER: 30 * 60  // ✅ Add this if you're caching orders
 // };
-// export const CACHE_TTL = {
-//     FOODS: 60 * 60,         // 1 hour
-//     TAGS: 30 * 60,          // 30 minutes
-//     SEARCH: 15 * 60,        // 15 minutes
-//     FOOD_DETAIL: 60 * 60,   // 1 hour
-//     USER: 60 * 60,          // ✅ Add this: 1 hour for user data
-//   };
-
-export const CACHE_TTL = {
-  FOODS: 60 * 60,
-  TAGS: 30 * 60,
-  SEARCH: 15 * 60,
-  FOOD_DETAIL: 60 * 60,
-  USER: 60 * 60,
-  ORDER: 30 * 60  // ✅ Add this if you're caching orders
-};
 
   
 
+// const client = createClient({
+//   url: process.env.REDIS_URL || 'redis://:384829842@redis-16958.c301.ap-south-1-1.ec2.redns.redis-cloud.com:16958',
+// });
+
+// client.connect().catch((err) => {
+//   console.error('Redis connection error:', err);
+// });
+
+// const metrics = {
+//   totalRequests: 0,
+//   hits: 0,
+//   misses: 0,
+//   lastUpdated: null,
+//   get hitRatio() {
+//     return this.totalRequests === 0 ? 0 : this.hits / this.totalRequests;
+//   }
+// };
+
+// export const cache = {
+//   metrics,
+//   client,
+
+//   async get(key) {
+//     try {
+//       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis GET: ${key}`);
+//       metrics.totalRequests++;
+//       const data = await client.get(key);
+//       if (data) {
+//         metrics.hits++;
+//         metrics.lastUpdated = new Date();
+//         return JSON.parse(data);
+//       } else {
+//         metrics.misses++;
+//         metrics.lastUpdated = new Date();
+//         return null;
+//       }
+//     } catch (error) {
+//       console.error('Redis get error:', error);
+//       return null;
+//     }
+//   },
+
+//   async set(key, value, ttl) {
+//     try {
+//       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis SET: ${key}`);
+//       if (typeof ttl !== 'number' || ttl <= 0) throw new Error(`Invalid TTL for Redis SET: ${ttl}`);
+//       if (value === undefined) throw new Error(`Value for Redis SET is undefined (key=${key})`);
+//       await client.setEx(key, ttl, JSON.stringify(value));
+//       return true;
+//     } catch (error) {
+//       console.error('Redis set error:', error);
+//       return false;
+//     }
+//   },
+
+//   async delete(key) {
+//     try {
+//       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis DELETE: ${key}`);
+//       return await client.del(key);
+//     } catch (error) {
+//       console.error('Redis delete error:', error);
+//       return false;
+//     }
+//   },
+// };
+// src/services/cache.ts or wherever you manage Redis
+
+import { createClient } from 'redis';
+
+export const CACHE_TTL = {
+  FOODS: 60 * 60,         // 1 hour
+  TAGS: 30 * 60,          // 30 minutes
+  SEARCH: 15 * 60,        // 15 minutes
+  FOOD_DETAIL: 60 * 60,   // 1 hour
+  USER: 60 * 60,          // 1 hour
+  ORDER: 30 * 60          // 30 minutes
+};
+
+// Use Redis Cloud URL from environment or fallback to local Redis (for development)
+const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+
+// Create Redis client
 const client = createClient({
-  url: process.env.REDIS_URL || 'redis://:384829842@redis-16958.c301.ap-south-1-1.ec2.redns.redis-cloud.com:16958',
+  url: redisUrl,
+  socket: {
+    reconnectStrategy: retries => {
+      console.warn(`🔁 Redis reconnect attempt #${retries}`);
+      return Math.min(retries * 100, 3000); // retry with delay
+    }
+  }
 });
 
+// Event listeners for logging
+client.on('connect', () => console.log('✅ Redis connected'));
+client.on('error', (err) => console.error('❌ Redis connection error:', err));
+
+// Connect Redis
 client.connect().catch((err) => {
-  console.error('Redis connection error:', err);
+  console.error('❌ Redis initial connect error:', err);
 });
 
+// Metrics to monitor caching
 const metrics = {
   totalRequests: 0,
   hits: 0,
@@ -216,11 +310,12 @@ const metrics = {
   }
 };
 
+// Cache wrapper
 export const cache = {
   metrics,
   client,
 
-  async get(key) {
+  async get(key: string) {
     try {
       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis GET: ${key}`);
       metrics.totalRequests++;
@@ -240,7 +335,7 @@ export const cache = {
     }
   },
 
-  async set(key, value, ttl) {
+  async set(key: string, value: any, ttl: number) {
     try {
       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis SET: ${key}`);
       if (typeof ttl !== 'number' || ttl <= 0) throw new Error(`Invalid TTL for Redis SET: ${ttl}`);
@@ -253,7 +348,7 @@ export const cache = {
     }
   },
 
-  async delete(key) {
+  async delete(key: string) {
     try {
       if (typeof key !== 'string') throw new Error(`Invalid key type for Redis DELETE: ${key}`);
       return await client.del(key);
