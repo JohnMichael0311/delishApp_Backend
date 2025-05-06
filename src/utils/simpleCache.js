@@ -276,7 +276,7 @@ export const CACHE_TTL = {
 };
 
 // Use Redis Cloud URL from environment or fallback to local Redis (for development)
-const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+const redisUrl = process.env.REDIS_URL;
 
 // Create Redis client
 const client = createClient({
