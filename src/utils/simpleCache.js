@@ -263,7 +263,6 @@
 //     }
 //   },
 // };
-
 import { createClient } from 'redis';
 
 export const CACHE_TTL = {
@@ -275,8 +274,8 @@ export const CACHE_TTL = {
   ORDER: 30 * 60          // 30 minutes
 };
 
-// Use Redis Cloud URL from environment or fallback to local Redis (for development)
-const client = createClient({ url: process.env.REDIS_URL || 'redis://localhost:6379' });
+// Use Redis Cloud URL or fallback to local Redis (you requested to hardcode your Redis URL here)
+const redisUrl = 'rediss://default:AUcCAAIjcDFhNDk4ODU1NDYwMmE0YjQ5OTA0MjkwMTNiMjgwYzA4N3AxMA@boss-werewolf-18178.upstash.io:6379';
 
 // Create Redis client
 const client = createClient({
@@ -357,4 +356,3 @@ export const cache = {
     }
   },
 };
-
