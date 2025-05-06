@@ -199,7 +199,7 @@ export const CACHE_TTL = {
   
 
 const client = createClient({
-  url: process.env.REDIS_URL || 'redis://localhost:6379',
+  url: process.env.REDIS_URL || 'redis://:384829842@redis-16958.c301.ap-south-1-1.ec2.redns.redis-cloud.com:16958',
 });
 
 client.connect().catch((err) => {
