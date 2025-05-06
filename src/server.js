@@ -266,12 +266,14 @@ app.use(express.json());
 
 // ✅ FIXED: Remove trailing slash from allowed origin
 const allowedOrigins = [
-  'https://delish-frontend-ctniwh08u-john-michaels-projects-49379021.vercel.app'
+  'http://localhost:3000',
+  'https://delish-frontend-l6qku1duz-john-michaels-projects-49379021.vercel.app'
 ];
+
 
 const corsOptions = {
   origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || allowedOrigins.some(o => typeof o === 'string' ? o === origin : o.test(origin))) {
       callback(null, true);
     } else {
       callback(new Error('CORS not allowed from this origin: ' + origin));
@@ -281,8 +283,9 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 };
+// app.use(cors(corsOptions));
+app.use(cors({ origin: true, credentials: true }));
 
-app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 
 // Monitoring routes
